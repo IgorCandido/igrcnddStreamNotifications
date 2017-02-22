@@ -4,16 +4,16 @@ node_modules
 npm-debug.log
 
 # Local bundles
-/bundles/**
+#/bundles/**
 
 # Datastores
-/db/**
+#/db/**
 
 # Logs
 /logs/**
 
 # Configs
-/cfg
+#/cfg
 
 # OS specific
 .DS_Store
@@ -29,8 +29,8 @@ npm-debug.log
 /coverage
 
 # Test folders
-/bundles2
-/bundles_off
+#/bundles2
+#/bundles_off
 
 # Compiled docs
 docs

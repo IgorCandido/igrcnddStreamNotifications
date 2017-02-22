@@ -1,0 +1,30 @@
+{
+    "name": "testAlert",
+    "version": "0.0.1",
+    "description": "Push alerts to stream",
+    "authors": [
+        "Igor Candido"
+    ],
+    "homepage": "",
+    "license": "",
+    "dependencies": {
+        "request": "^2.61.0"
+    },
+    "nodecg": {
+        "compatibleRange": "~0.8.0",
+        "dashboardPanels": [{
+            "headerColor": "#564573",
+            "name": "testAlert",
+            "title": "Alert Dash",
+            "width": 2,
+            "file": "panel.html",
+            "faIcon": "fa-twitch"
+        }],
+        "graphics": [{
+            "file": "index.html",
+            "width": 1280,
+            "height": 720,
+            "singleInstance": false
+        }]
+    }
+}
