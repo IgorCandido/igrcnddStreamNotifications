@@ -3,9 +3,10 @@
 	background-size: 100% 100%;
 	width: 500px;
 	height: 60px;
-	display: none;
+	display: block;
+	visibility: hidden;
 }
 
 .bannerOn {
-	display: block;
+	visibility: visible;
 }

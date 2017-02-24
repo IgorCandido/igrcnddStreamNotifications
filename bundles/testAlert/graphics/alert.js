@@ -1,10 +1,32 @@
-nodecg.listenFor('changeVisibility', function(show) {
+var visible = false;
+
+nodecg.listenFor('changeVisibility', function() {
+	toggleAlert();
+});
+
+function toggleAlert(){
 	var banner = $(".banner");
 
-	if(!show){
-		banner.removeClass("bannerOn");
+	if(visible){
+		applyAnimation(banner, "bounceOutRight", false);
 	}
 	else{
-		banner.addClass("bannerOn")
+		applyAnimation(banner, "bounceInRight", true);
 	}
-});
+
+	visible = !visible;
+}
+
+function applyAnimation(element, animation, visible){
+	animationString = animation + " animated"
+	if(visible){
+      	element.addClass("bannerOn");
+    }
+
+	element.addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
+      $(this).removeClass(animationString);
+      if(!visible){
+      	element.removeClass("bannerOn");
+      }
+    });
+}
