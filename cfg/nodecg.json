@@ -1,0 +1,15 @@
+{
+    "login": {
+        "enabled": true,
+        "sessionSecret": "supersecret",
+        "twitch": {
+            "enabled": true,
+            "clientID": "mmc7pl9j1dnwe1gj2biuvajzbulswm",
+            "clientSecret": "a9q0orqjat0rkuelpwi41c42ebizzp",
+            "scope": "user_read",
+            "allowedUsernames": [
+                "igrcndd"
+            ]
+        }
+    }
+}

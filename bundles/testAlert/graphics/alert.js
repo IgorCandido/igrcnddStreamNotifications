@@ -2,10 +2,16 @@ var visible = false;
 var showingAlert = false;
 var queue = [];
 
+nodecg.listenFor('channel-followed', 'nodecg-twitch-service',function(user){
+	notification = {text : user.display_name};
+	alert(notification);
+});
+
 // Event listener that triggers alert or queues if one is being showed currently
-nodecg.listenFor('changeVisibility', function(d) {
+nodecg.listenFor('changeVisibility', alert);
+
+function alert(d){
 	d = d || {};
-	d.text = "This is a test";
 	if(showingAlert){
 		console.log("queuing");
 		queue.unshift(d);
@@ -13,7 +19,7 @@ nodecg.listenFor('changeVisibility', function(d) {
 	}
 
 	showAlert(d);
-});
+}
 
 // This function shows alerts and triggers queued alerts
 // Currently it is not possible to change the time between alerts as we are not receiving receiving the event that the notification is hidden
