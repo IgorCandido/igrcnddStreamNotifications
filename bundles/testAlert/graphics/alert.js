@@ -2,7 +2,7 @@ var visible = false;
 var showingAlert = false;
 var queue = [];
 
-nodecg.listenFor('channel-followed', 'nodecg-twitch-service',function(user){
+nodecg.listenFor('channel-followed', function(user){
 	notification = {text : user.display_name};
 	alert(notification);
 });
