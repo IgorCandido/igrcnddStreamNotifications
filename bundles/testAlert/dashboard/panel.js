@@ -1,9 +1,11 @@
+var typeOfNotification = [{notificationText: " is now following", type: "Follower"}];
+
 $( document ).ready(function() {
 
 	$("#toggle").click(function(){
-
-		nodecg.sendMessage("changeVisibility");
-
+		var followertest = $("#followerName").val();
+		nodecg.sendMessage("channel-followed", {display_name : followertest, type : 0});
+		$("#followerName").val("");
 	});
 });
 
@@ -12,4 +14,8 @@ var viewers = nodecg.Replicant('ChannelViewersTotal', {defaultValue: 0});
 viewers.on('change', function(newValue, oldValue) {
 	console.log("Viewers from " + oldValue + "to new value " + newValue);
     document.getElementById("viewers").textContent = newValue;
+});
+
+nodecg.listenFor('channel-followed', function(user){
+	$("#event").text(user.display_name + typeOfNotification[user.type].notificationText);
 });

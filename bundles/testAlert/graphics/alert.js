@@ -1,9 +1,10 @@
 var visible = false;
 var showingAlert = false;
 var queue = [];
+var typeOfNotification = [{notificationText: " is now following", type: "Follower"}];
 
 nodecg.listenFor('channel-followed', function(user){
-	notification = {text : user.display_name};
+	notification = {text : user.display_name, type: user.type};
 	alert(notification);
 });
 
@@ -74,7 +75,14 @@ function applyAnimation(d, element, text, animation, visible){
 	animationString = animation + " animated"
 	if(visible){
       	element.addClass("bannerOn");
-      	text.text(d.text);	
+
+      	var textToShow = d.text;
+      	if(d.type != null)
+      	{
+      		textToShow = d.text + typeOfNotification[d.type].notificationText;
+      	} 
+
+      	text.text(textToShow);	
     }
 
 	element.addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){

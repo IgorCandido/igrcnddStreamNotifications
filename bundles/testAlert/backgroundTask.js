@@ -11,7 +11,7 @@ module.exports = function(nodecg, Twitch){
 				
 				//New follow observed
 				if(lastFollowRequestDate < followDate){
-					nodecg.sendMessage("channel-followed", {display_name : follow.user.display_name});
+					nodecg.sendMessage("channel-followed", {display_name : follow.user.display_name, type : 0});
 
 					lastFollowRequestDate = followDate;
 					lastFollowRequest.value = lastFollowRequestDate.toISOString();

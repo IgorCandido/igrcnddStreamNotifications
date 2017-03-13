@@ -13,7 +13,9 @@
 }
 
 #text {
-	top: 20px;
+	top: 12px;
 	left: 80px;
 	position: relative;
+	font-family: "Georgia" ;
+	font-size: 30px;
 }
