@@ -1,0 +1,9 @@
+version: '2'
+services:
+    web:
+        build: .
+        ports:
+          - "9090:9090"
+        volumes:
+          - ./bundles:/usr/src/app/bundles
+          - ./cfg:/usr/src/app/cfg
