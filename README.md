@@ -1,1 +1,1 @@
-Simple project with NodeCG to implement stream notifications
+Simple project with NodeCG to implement stream notifications for now to use at www.twitch.tv/igrcndd
