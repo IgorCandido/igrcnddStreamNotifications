@@ -2,33 +2,38 @@ module.exports = function(nodecg, Twitch){
 	var lastFollowRequest = nodecg.Replicant('lastFollowRequests', {defaultValue: "1970-01-01T00:00:00.000Z"});
 	var followOffset = nodecg.Replicant('followOffset', {defaultValue: 0});
 	var lastFollowRequestDate = new Date(lastFollowRequest.value);
+	var trackingEvents = [{type: 0, display: "Followers", eventId: "channel-followed", resourceUrl: "/channels/{{username}}/follows",
+	 												offset: nodecg.Replicant('followOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastFollowRequestx', {defaultValue: "1970-01-01T00:00:00.000Z"}),
+													lastObservedDate: function(){return new Date(this.lastObserved.value)},
+													eventText: function(event){ return event.user.display_name },
+													getElements: function(twitchResponse){ return twitchResponse.body.follows; }}]
 
 	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
 
-  // Iterate over new followers and push notification
-	function NewFollowers(nodecg, Twitch){
-		FetchFollowers(nodecg, Twitch, function(followerResponse){
-			followerResponse.body.follows.forEach(follow => {
-				var followDate = new Date(follow.created_at);
+  // Iterate over new events and push notification
+	function NewNotification(nodecg, Twitch, trackingEvent){
+		FetchEvents(nodecg, Twitch, trackingEvent, function(response){
+			trackingEvent.getElements(response).forEach(event => {
+				var eventDate = new Date(event.created_at);
+				
+				//New observed
+				if(trackingEvent.lastObservedDate() < eventDate){
+					nodecg.log.info("New event observed")
+					nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type});
 
-				//New follow observed
-				if(lastFollowRequestDate < followDate){
-					nodecg.sendMessage("channel-followed", {display_name : follow.user.display_name, type : 0});
-
-					lastFollowRequestDate = followDate;
-					followOffset.value += 1;
-					lastFollowRequest.value = lastFollowRequestDate.toISOString();
+					trackingEvent.offset.value += 1;
+					trackingEvent.lastObserved.value = eventDate.toISOString();
 				}
 			})
 		});
 	}
 
 	// Get the next 25 next followers
-	function FetchFollowers(nodecg, Twitch, callback){
-		Twitch.get('/channels/{{username}}/follows', {
+	function FetchEvents(nodecg, Twitch, trackingEvent, callback){
+		Twitch.get(trackingEvent.resourceUrl, {
 				    limit: 25,
 				    direction: 'asc',
-				    offset: followOffset.value
+				    offset: trackingEvent.offset.value
 		}).then(response =>{
 			if (response.statusCode !== 200) {
 		        return nodecg.log.error(response.body.error, response.body.message);
@@ -40,10 +45,11 @@ module.exports = function(nodecg, Twitch){
 		});
 	}
 
-	// Poll list of followers
+	// Poll list of events
 	setInterval(function(){
 		nodecg.log.info("polling followers");
-		NewFollowers(nodecg, Twitch);
+		// Follows
+		NewNotification(nodecg, Twitch, trackingEvents[0]);
 	}, 4000);
 }
 

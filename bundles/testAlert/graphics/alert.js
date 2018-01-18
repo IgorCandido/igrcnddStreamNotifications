@@ -1,7 +1,10 @@
 var visible = false;
 var showingAlert = false;
 var queue = [];
-var typeOfNotification = [{notificationText: " is now following", type: "Follower"}];
+var typeOfNotification = [
+	{notificationText: " is now following", type: "Follower", playAlert: function(){ nodecg.playSound("follower") }},
+	{notificationText: " just subscribed!", type: "Subscriber", playAlert: function(){ nodecg.playSound("subscriber")}}
+];
 
 nodecg.listenFor('channel-followed', function(user){
 	notification = {text : user.display_name, type: user.type};
@@ -64,7 +67,7 @@ function toggleAlert(d){
 	}
 	else{
 		applyAnimation(d, banner, text, "bounceInRight", true);
-		nodecg.playSound("follower")
+		typeOfNotification[d.type].playAlert()
 	}
 
 	visible = !visible;
