@@ -43,6 +43,11 @@
             "name": "follower",
             "defaultVolume": 100,
             "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
+          },
+          {
+            "name": "subscriber",
+            "defaultVolume": 100,
+            "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
           }
         ]
     }
