@@ -27,8 +27,6 @@ npm-debug.log
 .nyc_output
 
 # Test folders
-#/bundles2
-#/bundles_off
 /_workingTest
 
 # Compiled docs
