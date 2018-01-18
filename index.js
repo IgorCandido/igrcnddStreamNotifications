@@ -1,11 +1,20 @@
 'use strict';
 
+process.title = 'NodeCG';
 global.exitOnUncaught = true;
 
-if (process.cwd() !== __dirname) {
-	console.warn('[nodecg] process.cwd is %s, expected %s', process.cwd(), __dirname);
+const cwd = process.cwd();
+global.isZeitPkg = __dirname.startsWith('/snapshot/') || __dirname.toLowerCase().startsWith('c:\\snapshot\\');
+if (global.isZeitPkg) {
+	console.info('[nodecg] Detected that NodeCG is running inside a ZEIT pkg (https://github.com/zeit/pkg)');
+} else if (cwd !== __dirname) {
+	console.warn('[nodecg] process.cwd is %s, expected %s', cwd, __dirname);
 	process.chdir(__dirname);
 	console.info('[nodecg] Changed process.cwd to %s', __dirname);
+}
+
+if (!process.env.NODECG_ROOT) {
+	process.env.NODECG_ROOT = process.cwd();
 }
 
 const semver = require('semver');
@@ -17,7 +26,7 @@ if (!semver.satisfies(nodeVersion, '>=6')) {
 }
 
 process.on('uncaughtException', err => {
-	if (!global.rollbarEnabled) {
+	if (!global.sentryEnabled) {
 		if (global.exitOnUncaught) {
 			console.error('UNCAUGHT EXCEPTION! NodeCG will now exit.');
 		} else {
@@ -29,6 +38,13 @@ process.on('uncaughtException', err => {
 		if (global.exitOnUncaught) {
 			process.exit(1);
 		}
+	}
+});
+
+process.on('unhandledRejection', err => {
+	if (!global.sentryEnabled) {
+		console.error('UNHANDLED PROMISE REJECTION!');
+		console.error(err);
 	}
 });
 

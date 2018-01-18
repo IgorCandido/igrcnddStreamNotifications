@@ -1,15 +1,8 @@
 {
 	"source": {
 		"include": [
-			"./lib",
+			"./lib/api.js",
 			"./README.md"
-		],
-		"exclude": [
-			"./lib/browser/dist",
-			"./lib/browser/shims",
-			"./lib/browser/replicant",
-			"./lib/replicant/shared",
-			"./lib/replicator"
 		]
 	},
 	"tags": {
@@ -32,5 +25,8 @@
 		"template": "./node_modules/minami",
 		"tutorials": "./tutorials",
 		"destination": "./docs/"
+	},
+	"markdown": {
+		"idInHeadings": true
 	}
 }

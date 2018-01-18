@@ -29,7 +29,7 @@ function showAlert(d){
 	console.log("showing");
 
 	toggleAlert(d);
-	setTimeout(function(){ 
+	setTimeout(function(){
 		console.log("hiding");
 		// Dispach queue when close animation is finished instead of based on hardcoded timeout
 		toggleAlert(d);
@@ -46,9 +46,9 @@ function dispatchQueued(){
 	if(alert != null){
 		console.log("dispaching popped");
 		showAlert(alert);
-		return;	
+		return;
 	}
-	
+
 	console.log("nothing popped");
 	showingAlert = false;
 }
@@ -63,8 +63,8 @@ function toggleAlert(d){
 		applyAnimation(d, banner, text, "bounceOutRight", false);
 	}
 	else{
-		
 		applyAnimation(d, banner, text, "bounceInRight", true);
+		nodecg.playSound("follower")
 	}
 
 	visible = !visible;
@@ -80,10 +80,10 @@ function applyAnimation(d, element, text, animation, visible){
       	if(d.type != null)
       	{
       		textToShow = d.text + typeOfNotification[d.type].notificationText;
-      	} 
+      	}
 
-      	text.text(textToShow);	
-    }
+      	text.text(textToShow);
+  }
 
 	element.addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
       $(this).removeClass(animationString);

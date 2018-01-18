@@ -7,4 +7,7 @@ services:
         volumes:
           - ./bundles:/usr/src/app/bundles
           - ./cfg:/usr/src/app/cfg
-          - ./db:/usr/src/app/db
+          - db-data:/usr/src/app/db
+
+volumes:
+  db-data:
