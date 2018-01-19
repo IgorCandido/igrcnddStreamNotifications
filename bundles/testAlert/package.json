@@ -25,11 +25,26 @@
             "width": 1280,
             "height": 720,
             "singleInstance": false
-        }],
+        }, {
+            "file": "slidingbanner.html",
+            "width": 1280,
+            "height": 720,
+            "singleInstance": false
+          }],
         "assetCategories": [
           {
             "name": "followerArt",
             "title": "Follower Notification Background",
+            "allowedTypes": [
+              "jpg",
+              "jpeg",
+              "gif",
+              "png"
+            ]
+          },
+          {
+            "name": "socials",
+            "title": "Social images",
             "allowedTypes": [
               "jpg",
               "jpeg",

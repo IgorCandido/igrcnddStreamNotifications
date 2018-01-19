@@ -15,7 +15,7 @@ module.exports = function(nodecg, Twitch){
 		FetchEvents(nodecg, Twitch, trackingEvent, function(response){
 			trackingEvent.getElements(response).forEach(event => {
 				var eventDate = new Date(event.created_at);
-				
+
 				//New observed
 				if(trackingEvent.lastObservedDate() < eventDate){
 					nodecg.log.info("New event observed")
@@ -51,6 +51,26 @@ module.exports = function(nodecg, Twitch){
 		// Follows
 		NewNotification(nodecg, Twitch, trackingEvents[0]);
 	}, 4000);
+
+	nodecg.Replicant('periodforslides', {defaultValue: 30000}).value = 30000;
+	var periodforslides = nodecg.Replicant('periodforslides', {defaultValue: 30000}).value;
+
+
+	nodecg.log.info("periodVal " + periodforslides);
+
+	// Show socials
+	setInterval(function(){
+			var socialImages = nodecg.Replicant('assets:socials').value;
+
+			var socialBanner = {
+														images: socialImages.map(image => { return { Url: image.url } }),
+														timeperslide: nodecg.Replicant('timeperslide', {defaultValue: 1500}).value,
+														transitionsspeed: nodecg.Replicant('transitionsspeed', {defaultValue: 1000}).value
+												 }
+			nodecg.log.info("pushing socials");
+
+			nodecg.sendMessage("channel-slideshow", socialBanner);
+	}, periodforslides)
 }
 
 
