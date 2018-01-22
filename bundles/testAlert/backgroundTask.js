@@ -45,21 +45,7 @@ module.exports = function(nodecg, Twitch){
 		});
 	}
 
-	// Poll list of events
-	setInterval(function(){
-		nodecg.log.info("polling followers");
-		// Follows
-		NewNotification(nodecg, Twitch, trackingEvents[0]);
-	}, 4000);
-
-	nodecg.Replicant('periodforslides', {defaultValue: 30000}).value = 30000;
-	var periodforslides = nodecg.Replicant('periodforslides', {defaultValue: 30000}).value;
-
-
-	nodecg.log.info("periodVal " + periodforslides);
-
-	// Show socials
-	setInterval(function(){
+	function PushSocials(){
 			var socialImages = nodecg.Replicant('assets:socials').value;
 
 			var socialBanner = {
@@ -70,8 +56,31 @@ module.exports = function(nodecg, Twitch){
 			nodecg.log.info("pushing socials");
 
 			nodecg.sendMessage("channel-slideshow", socialBanner);
-	}, periodforslides)
+
+			var periodforslides = nodecg.Replicant('periodforslides', {defaultValue: 30000}).value;
+
+			nodecg.log.info("Socials Period " + periodforslides);
+
+			setTimeout(PushSocials, periodforslides)
+	}
+
+	// Poll list of events
+	setInterval(function(){
+		nodecg.log.info("polling followers");
+		// Follows
+		NewNotification(nodecg, Twitch, trackingEvents[0]);
+	}, 4000);
+
+	var periodforslides = nodecg.Replicant('periodforslides', {defaultValue: 30000}).value;
+
+
+	nodecg.log.info("periodVal " + periodforslides);
+
+	// Show socials
+	setTimeout(PushSocials, periodforslides)
 }
+
+
 
 
 /* username = response.body.follows.reverse()[0].user.name;
