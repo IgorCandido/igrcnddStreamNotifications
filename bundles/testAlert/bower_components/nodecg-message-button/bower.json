@@ -1,0 +1,31 @@
+{
+  "name": "nodecg-message-button",
+  "version": "0.2.0",
+  "description": "A paper-button which sends a message to the bundle it is within",
+  "authors": [
+    "ProbablePrime"
+  ],
+  "keywords": [
+    "nodecg",
+    "dashboard",
+    "polymer",
+    "button"
+  ],
+  "main": "nodecg-message-button.html",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/ProbablePrime/nodecg-message-button"
+  },
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "paper-styles": "PolymerElements/paper-styles#~1.1.3",
+    "paper-button": "PolymerElements/paper-button#^1.0.3"
+  }
+}

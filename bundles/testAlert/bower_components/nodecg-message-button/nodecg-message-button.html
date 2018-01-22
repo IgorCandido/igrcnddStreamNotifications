@@ -1,0 +1,70 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="/dashboard/style/nodecg-styles.html">
+
+<dom-module id="nodecg-message-button">
+    <style>
+        :host {
+            display: flex;
+        }
+        paper-button {
+            color:#FFF;
+            flex: 1;
+        }
+        :host(.warning) paper-button {
+            background-color: var(--nodecg-warning-color);
+        }
+        :host(.success) paper-button {
+            background-color: var(--nodecg-success-color);
+        }
+        :host(.info) paper-button {
+            background-color: var(--nodecg-info-color);
+        }
+        :host(.configure) paper-button {
+            background-color: var(--nodecg-configure-color);
+        }
+        :host(.danger) paper-button {
+            background-color: var(--nodecg-danger-color);
+        }
+        :;
+    </style>
+    <template>
+        <paper-button class="button"
+            active$="[[active]]"
+            disabled$="[[disabled]]"
+            elevation$="[[elevation]]"
+            focused$="[[focused]]"
+            noink$="[[noink]]"
+            pointerDown$="[[pointerDown]]"
+            pressed$="[[pressed]]"
+            raised$="[[raised]]"
+            receivedFocusFromKeyboard$="[[receivedFocusFromKeyboard]]"
+            stopKeyboardEventPropagation$="[[stopKeyboardEventPropagation]]"
+            on-click="sendMessage">
+                <content></content>
+        </paper-button>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+        is: 'nodecg-message-button',
+        properties: {
+            message: {
+                type: String,
+                value:''
+            },
+            data: {
+                type: Object,
+                value: {}
+            }
+        },
+        sendMessage: function() {
+            if(window.nodecg) {
+                nodecg.sendMessage(this.message,this.data);
+            }
+        }
+    });
+</script>
+
+

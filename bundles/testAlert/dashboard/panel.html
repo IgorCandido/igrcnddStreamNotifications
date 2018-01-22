@@ -2,22 +2,36 @@
 <html lang="en">
 <head>
 	<script src="../bower_components/jquery/jquery.js"></script>
+	<link rel="import" href="../bower_components/paper-input/paper-input.html">
+	<link rel="import" href="../bower_components/paper-button/paper-button.html">
+	<link rel="import" href="../bower_components/nodecg-replicant/nodecg-replicant.html">
+	<link rel="import" href="../bower_components/paper-card/paper-card.html">
+	<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+	<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+	<link rel="import" href="../bower_components/nodecg-message-button/nodecg-message-button.html">
+	<link rel="import" href="../bower_components/nodecg-toggle/nodecg-toggle.html">
+	<link rel="import" href="../bower_components/nodecg-replicant-input/nodecg-replicant-input.html">
 	<link rel="stylesheet" href="panel.css">
 	<script src="panel.js"></script>
 </head>
 <body>
-	<div>
-		<div>
-			<span>Follower name test:</span>
-			<input id="followerName" type="text"/>
-		</div>
-		<button id="toggle">Push</button>
-	</div>
+	<paper-card heading="Followers">
+			<div>
+				Follower name test:
+				<paper-input label="Follower name" id="followerName" type="text"/>
+			</div>
+			<paper-button raised class="info" id="toggle">Push</paper-button>
+			<div>
+				<div><span>Last event: </span><span id="event"></span></div>
+			</div>
+	</paper-card>
+	<paper-card heading="Banner Configuration">
+		<nodecg-replicant-input label="Timer Per Slide" replicant-name="timeperslide"></nodecg-replicant-input>
+		<nodecg-replicant-input label="Transaction Speed" replicant-name="transitionsspeed"></nodecg-replicant-input>
+		<nodecg-replicant-input label="Interval" replicant-name="periodforslides"></nodecg-replicant-input>
+	</paper-card>
 	<div>
 		<div><span>Viewers :</span><span id="viewers"></span></div>
-	</div>
-	<div>
-		<div><span>Last event: </span><span id="event"></span></div>
 	</div>
 </body>
 </html>

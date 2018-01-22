@@ -1,0 +1,11 @@
+{
+  "name": "nodecg-replicant-input",
+  "_cacheHeaders": {
+    "Content-Type": "text/html; charset=utf-8"
+  },
+  "main": "index",
+  "_source": "https://github.com/NodeCGElements/nodecg-replicant-input",
+  "_target": "*",
+  "_originalSource": "https://github.com/NodeCGElements/nodecg-replicant-input",
+  "_direct": true
+}

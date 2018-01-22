@@ -1,0 +1,112 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="../iron-form-element-behavior/iron-form-element-behavior.html">
+<link rel="import" href="../iron-input/iron-input.html">
+<link rel="import" href="../paper-input/paper-input-behavior.html">
+<link rel="import" href="../paper-input/paper-input-char-counter.html">
+<link rel="import" href="../paper-input/paper-input-container.html">
+<link rel="import" href="../paper-input/paper-input-error.html">
+<link rel="import" href="../nodecg-replicant/nodecg-replicant.html">
+
+<!--
+`nodecg-replicant-input` is a custom implementation of [`paper-input`](https://elements.polymer-project.org/elements/paper-input)
+that binds its value to a NodeCG Replicant.
+It has all the same properties and methods as `paper-input`, but adds two more: `replicantName` and `replicantBundle`.
+    <nodecg-replicant-input label="Input label" replicant-name="myReplicant"></nodecg-replicant-input>
+`replicantBundle` is optional and defaults to the value of the current bundle.
+-->
+
+<dom-module id="nodecg-replicant-input">
+    <template>
+		<style>
+			:host {
+				display: block;
+			}
+			:host([focused]) {
+				outline: none;
+			}
+			:host([hidden]) {
+				display: none !important;
+			}
+			input::-webkit-input-placeholder {
+				color: var(--paper-input-container-color, --secondary-text-color);
+			}
+			input:-moz-placeholder {
+				color: var(--paper-input-container-color, --secondary-text-color);
+			}
+			input::-moz-placeholder {
+				color: var(--paper-input-container-color, --secondary-text-color);
+			}
+			input:-ms-input-placeholder {
+				color: var(--paper-input-container-color, --secondary-text-color);
+			}
+			label {
+				pointer-events: none;
+			}
+		</style>
+
+		<paper-input-container no-label-float="[[noLabelFloat]]" always-float-label="[[_computeAlwaysFloatLabel(alwaysFloatLabel,placeholder)]]" auto-validate$="[[autoValidate]]" disabled$="[[disabled]]" invalid="[[invalid]]">
+
+			<nodecg-replicant replicant-name="[[replicantName]]" replicant-bundle="[[replicantBundle]]" value="{{value}}"></nodecg-replicant>
+
+			<content select="[prefix]"></content>
+
+			<label hidden$="[[!label]]" aria-hidden="true" for="input">[[label]]</label>
+
+			<input is="iron-input" id="input"
+				   aria-labelledby$="[[_ariaLabelledBy]]"
+				   aria-describedby$="[[_ariaDescribedBy]]"
+				   disabled$="[[disabled]]"
+				   title$="[[title]]"
+				   bind-value="{{value}}"
+				   invalid="{{invalid}}"
+				   prevent-invalid-input="[[preventInvalidInput]]"
+				   allowed-pattern="[[allowedPattern]]"
+				   validator="[[validator]]"
+				   type$="[[type]]"
+				   pattern$="[[pattern]]"
+				   required$="[[required]]"
+				   autocomplete$="[[autocomplete]]"
+				   autofocus$="[[autofocus]]"
+				   inputmode$="[[inputmode]]"
+				   minlength$="[[minlength]]"
+				   maxlength$="[[maxlength]]"
+				   min$="[[min]]"
+				   max$="[[max]]"
+				   step$="[[step]]"
+				   name$="[[name]]"
+				   placeholder$="[[placeholder]]"
+				   readonly$="[[readonly]]"
+				   list$="[[list]]"
+				   size$="[[size]]"
+				   autocapitalize$="[[autocapitalize]]"
+				   autocorrect$="[[autocorrect]]"
+				   on-change="_onChange"
+				   tabindex$="[[tabindex]]"
+				   autosave$="[[autosave]]"
+				   results$="[[results]]"
+				   accept$="[[accept]]"
+				   multiple$="[[multiple]]">
+
+			<content select="[suffix]"></content>
+
+			<template is="dom-if" if="[[errorMessage]]">
+				<paper-input-error aria-live="assertive">[[errorMessage]]</paper-input-error>
+			</template>
+
+			<template is="dom-if" if="[[charCounter]]">
+				<paper-input-char-counter></paper-input-char-counter>
+			</template>
+
+		</paper-input-container>
+	</template>
+</dom-module>
+
+<script>
+	Polymer({
+		is: 'nodecg-replicant-input',
+		behaviors: [
+			Polymer.IronFormElementBehavior,
+			Polymer.PaperInputBehavior
+		]
+	});
+</script>

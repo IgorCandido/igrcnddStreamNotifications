@@ -1,0 +1,41 @@
+{
+  "name": "nodecg-replicant",
+  "version": "0.5.8",
+  "description": "A declarative implementation of NodeCG Replicants.",
+  "main": "nodecg-replicant.html",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nodecg/nodecg-replicant.git"
+  },
+  "keywords": [
+    "nodecg",
+    "dashboard",
+    "panel",
+    "element",
+    "polymer",
+    "component"
+  ],
+  "author": "Alex Van Camp <email@alexvan.camp>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nodecg/nodecg-replicant/issues"
+  },
+  "homepage": "https://github.com/nodecg/nodecg-replicant#readme",
+  "devDependencies": {
+    "babel-eslint": "^6.0.4",
+    "clone": "^1.0.2",
+    "eslint": "^2.10.2",
+    "eslint-config-xo": "^0.14.1",
+    "eslint-plugin-babel": "^3.2.0",
+    "polylint": "^2.10.1",
+    "webpack": "^1.13.0"
+  },
+  "scripts": {
+    "test": "npm run static",
+    "static": "npm run static:js && npm run static:polymer",
+    "static:js": "eslint nodecg-replicant.src.js nodecg-replicant-targeting.js",
+    "static:polymer": "polylint --input nodecg-replicant.html nodecg-replicant-targeting.html",
+    "build": "npm run static && webpack --optimize-minimize",
+    "watch": "webpack --progress --colors --watch"
+  }
+}
