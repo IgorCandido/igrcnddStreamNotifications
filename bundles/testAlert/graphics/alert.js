@@ -1,6 +1,5 @@
 var visible = false;
-var showingAlert = false;
-var queue = [];
+
 var typeOfNotification = [
 	{notificationText: " is now following", type: "Follower", playAlert: function(){ nodecg.playSound("follower") }},
 	{notificationText: " just subscribed!", type: "Subscriber", playAlert: function(){ nodecg.playSound("subscriber")}}
@@ -14,21 +13,50 @@ nodecg.listenFor('channel-followed', function(user){
 // Event listener that triggers alert or queues if one is being showed currently
 nodecg.listenFor('changeVisibility', alert);
 
+var queue = function Queue(namespace){
+	var innerQueue = [];
+	namespace.showingAlert = false;
+
+	// Tries to execute event if not possible queues it
+	// Returns: true event can execute imediatly, false it was queue and should execute.
+	namespace.queue = function (action){
+								if(namespace.showingAlert){
+									console.log("queuing");
+									innerQueue.unshift(action);
+									return;
+								}
+								action();
+							}
+
+	namespace.dispatch = function (){
+								console.log("poping");
+								var action = innerQueue.pop();
+
+								if(action != null){
+									console.log("dispaching popped");
+									action();
+									return;
+								}
+
+								console.log("nothing popped");
+								queue.showingAlert = false;
+							}
+
+	return namespace;
+}({});
+
+
+
 function alert(d){
 	d = d || {};
-	if(showingAlert){
-		console.log("queuing");
-		queue.unshift(d);
-		return;
-	}
 
-	showAlert(d);
+	queue.queue( () => showAlert(d) )
 }
 
 // This function shows alerts and triggers queued alerts
 // Currently it is not possible to change the time between alerts as we are not receiving receiving the event that the notification is hidden
 function showAlert(d){
-	showingAlert = true;
+	queue.showingAlert = true;
 	console.log("showing");
 
 	toggleAlert(d);
@@ -36,24 +64,8 @@ function showAlert(d){
 		console.log("hiding");
 		// Dispach queue when close animation is finished instead of based on hardcoded timeout
 		toggleAlert(d);
-		setTimeout(dispatchQueued, 2000);
+		setTimeout(queue.dispatch, 2000);
 	}, 5000);
-}
-
-// Retriggers one queued alert
-function dispatchQueued(){
-	var alert;
-	console.log("poping");
-	alert = queue.pop();
-
-	if(alert != null){
-		console.log("dispaching popped");
-		showAlert(alert);
-		return;
-	}
-
-	console.log("nothing popped");
-	showingAlert = false;
 }
 
 // Ux manipulation to show alert
