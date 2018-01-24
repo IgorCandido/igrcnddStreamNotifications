@@ -4,7 +4,7 @@ $( document ).ready(function() {
 
 	$("#toggle").click(function(){
 		var followertest = $("#followerName").val();
-		nodecg.sendMessage("channel-followed", {display_name : followertest, type : 0});
+		nodecg.sendMessage("channel-followed", {display_name : followertest, type : 0, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
 		$("#followerName").val("");
 	});
 });
