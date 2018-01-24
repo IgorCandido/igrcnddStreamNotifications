@@ -6,66 +6,31 @@ var typeOfNotification = [
 ];
 
 nodecg.listenFor('channel-followed', function(user){
-	notification = {text : user.display_name, type: user.type};
+	notification = {text : user.display_name, type: user.type, showtime: user.showtime};
 	alert(notification);
 });
 
 // Event listener that triggers alert or queues if one is being showed currently
 nodecg.listenFor('changeVisibility', alert);
 
-var queue = function Queue(namespace){
-	var innerQueue = [];
-	namespace.showingAlert = false;
-
-	// Tries to execute event if not possible queues it
-	// Returns: true event can execute imediatly, false it was queue and should execute.
-	namespace.queue = function (action){
-								if(namespace.showingAlert){
-									console.log("queuing");
-									innerQueue.unshift(action);
-									return;
-								}
-								action();
-							}
-
-	namespace.dispatch = function (){
-								console.log("poping");
-								var action = innerQueue.pop();
-
-								if(action != null){
-									console.log("dispaching popped");
-									action();
-									return;
-								}
-
-								console.log("nothing popped");
-								queue.showingAlert = false;
-							}
-
-	return namespace;
-}({});
-
-
-
 function alert(d){
 	d = d || {};
 
-	queue.queue( () => showAlert(d) )
+	queue.queue({show: () => showAlert(d), hide: () => hideAlert(d), showtime: d.showtime})
 }
 
 // This function shows alerts and triggers queued alerts
 // Currently it is not possible to change the time between alerts as we are not receiving receiving the event that the notification is hidden
 function showAlert(d){
-	queue.showingAlert = true;
 	console.log("showing");
 
 	toggleAlert(d);
-	setTimeout(function(){
-		console.log("hiding");
-		// Dispach queue when close animation is finished instead of based on hardcoded timeout
-		toggleAlert(d);
-		setTimeout(queue.dispatch, 2000);
-	}, 5000);
+}
+
+function hideAlert(d){
+	console.log("hiding");
+	// Dispach queue when close animation is finished instead of based on hardcoded timeout
+	toggleAlert(d);
 }
 
 // Ux manipulation to show alert

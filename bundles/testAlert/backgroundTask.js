@@ -19,7 +19,7 @@ module.exports = function(nodecg, Twitch){
 				//New observed
 				if(trackingEvent.lastObservedDate() < eventDate){
 					nodecg.log.info("New event observed")
-					nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type});
+					nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
 
 					trackingEvent.offset.value += 1;
 					trackingEvent.lastObserved.value = eventDate.toISOString();
