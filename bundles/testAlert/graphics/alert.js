@@ -24,52 +24,25 @@ function alert(d){
 function showAlert(d){
 	console.log("showing");
 
-	toggleAlert(d);
+	var banner = $(".banner");
+	var text = $("#text");
+
+	// Set status on the alert
+	var textToShow = d.text;
+	if(d.type != null)
+	{
+		textToShow = d.text + typeOfNotification[d.type].notificationText;
+	}
+
+	text.text(textToShow);
+
+	typeOfNotification[d.type].playAlert()
+
+	animate.animateInOut(banner, true, "bounceInRight", "bannerOn")
 }
 
 function hideAlert(d){
 	console.log("hiding");
 	// Dispach queue when close animation is finished instead of based on hardcoded timeout
-	toggleAlert(d);
-}
-
-// Ux manipulation to show alert
-// Receive callback to notify that the animation is finished
-function toggleAlert(d){
-	var banner = $(".banner");
-	var text = $("#text");
-
-	if(visible){
-		applyAnimation(d, banner, text, "bounceOutRight", false);
-	}
-	else{
-		applyAnimation(d, banner, text, "bounceInRight", true);
-		typeOfNotification[d.type].playAlert()
-	}
-
-	visible = !visible;
-}
-
-// Css magic to animate the alert in or out
-function applyAnimation(d, element, text, animation, visible){
-	animationString = animation + " animated"
-	if(visible){
-      	element.addClass("bannerOn");
-
-      	var textToShow = d.text;
-      	if(d.type != null)
-      	{
-      		textToShow = d.text + typeOfNotification[d.type].notificationText;
-      	}
-
-      	text.text(textToShow);
-  }
-
-	element.addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-      $(this).removeClass(animationString);
-      if(!visible){
-      	element.removeClass("bannerOn");
-      	text.text("");
-      }
-    });
+	animate.animateInOut(banner, false, "bounceOutRight", "bannerOn")
 }

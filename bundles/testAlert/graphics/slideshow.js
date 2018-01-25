@@ -11,7 +11,7 @@ slide = function(namespace){
   namespace.stop = function(){
     running = false;
     if(nextSlideInterval != null){
-      clearInterval(nextSlideInterval);
+      clearTimeout(nextSlideInterval);
     }
 
     currentSlide = 0;
@@ -28,67 +28,41 @@ slide = function(namespace){
       nodecg.log.warn("No images provided");
       return;
     }
+    currentSlide = 0;
 
-    nextSlide(timeBetweenSlides)
-    setInterval(() => nextSlide(timeBetweenSlides), timePerSlide);
+    animate.animateInOut(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides, () => nextSlideInterval = setTimeout(nextSlide(timeBetweenSlides, timePerSlide), timeBetweenSlides));
   }
 
-  function nextSlide(timeBetweenSlides){
+  function nextSlide(timeBetweenSlides, timePerSlide){
     if(running == false){
       return;
     }
 
     // Got to the end of the slideshow
-    if(currentSlide == numberOfSlides){
+    if(currentSlide == (numberOfSlides - 1)){
       // Only care if run for a number of times
       if(numberOfRuns != null && (--numberOfRuns) == 0 ){
-        namespace.stop()
-        namespace.callback || namespace.callback();
+        // Transition out the last slide visble
+        animate.animateInOut(slides[currentSlide], false, "bounceOutRight", "bannerOn", timeBetweenSlides, () => {
+                                                                            if(namespace.callback != null){
+                                                                               namespace.callback();
+                                                                            }
+
+                                                                            namespace.stop()
+                                                                          })
+
       }
     }
 
-    changeSlide(timeBetweenSlides);
+    changeSlide(timeBetweenSlides, timePerSlide);
   }
 
-  function changeSlide(timeBetweenSlides){
-    toggleAlert(slides[currentSlide], false, timeBetweenSlides, () => {
+  function changeSlide(timeBetweenSlides, timePerSlide){
+    animate.animateInOut(slides[currentSlide], false, "bounceOutRight", "bannerOn", timeBetweenSlides, () => {
                                                                         ++currentSlide;
-                                                                        toggleAlert(slides[currentSlide], true, timeBetweenSlides);
+                                                                        animate.animateInOut(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides,() => nextSlideInterval = setTimeout(nextSlide(timeBetweenSlides, timePerSlide), timePerSlide))
                                                                       })
 
-  }
-
-  // Ux manipulation to show alert
-  // Receive callback to notify that the animation is finished
-  function toggleAlert(slide, show, timeBetweenSlides, next) {
-
-  	if(show){
-  		applyAnimation(slide, "bounceInRight", true, timeBetweenSlides, next);
-  	}
-  	else{
-  		applyAnimation(slide, "bounceOutRight", false, timeBetweenSlides, next);
-  	}
-  }
-
-  // Css magic to animate the alert in or out
-  function applyAnimation(element, animation, visible, timeBetweenSlides, next){
-    element = $(element);
-    element.css({'animationDuration' : timeBetweenSlides+"ms"});
-  	animationString = animation + " animated"
-  	if(visible){
-  	   element.addClass("bannerOn");
-    }
-
-  	element.addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend', function(){
-        $(this).removeClass(animationString);
-        if(!visible){
-        	element.removeClass("bannerOn");
-        }
-
-        if(next != null){
-          next();
-        }
-      });
   }
 
   namespace.callback = function(){}
