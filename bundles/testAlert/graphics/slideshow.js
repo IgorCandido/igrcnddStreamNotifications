@@ -5,13 +5,13 @@ slide = function(namespace){
   var numberOfSlides;
   var numberOfRuns;
   var running = false;
-  var nextSlideInterval;
+  var nextSlideTimeout;
   var currentSlide = 0;
 
   namespace.stop = function(){
     running = false;
-    if(nextSlideInterval != null){
-      clearTimeout(nextSlideInterval);
+    if(nextSlideTimeout != null){
+      clearTimeout(nextSlideTimeout);
     }
 
     currentSlide = 0;
@@ -30,7 +30,7 @@ slide = function(namespace){
     }
     currentSlide = 0;
 
-    animate.animateInOut(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides, () => nextSlideInterval = setTimeout(() => nextSlide(timeBetweenSlides, timePerSlide), timeBetweenSlides));
+    animateSlideSwitch(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides, timePerSlide);
   }
 
   function nextSlide(timeBetweenSlides, timePerSlide){
@@ -50,8 +50,10 @@ slide = function(namespace){
 
                                                                             namespace.stop()
                                                                           })
-
+        return;
       }
+
+      currentSlide = 0;
     }
 
     changeSlide(timeBetweenSlides, timePerSlide);
@@ -59,10 +61,18 @@ slide = function(namespace){
 
   function changeSlide(timeBetweenSlides, timePerSlide){
     animate.animateInOut(slides[currentSlide], false, "bounceOutRight", "bannerOn", timeBetweenSlides, () => {
+                                                                        if(currentSlide == numberOfSlides){
+                                                                          return;
+                                                                        }
+
                                                                         ++currentSlide;
-                                                                        animate.animateInOut(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides,() => nextSlideInterval = setTimeout(() => nextSlide(timeBetweenSlides, timePerSlide), timePerSlide))
+                                                                        animateSlideSwitch(slides[currentSlide], true, "bounceInRight", "bannerOn", timeBetweenSlides, timePerSlide)
                                                                       })
 
+  }
+
+  function animateSlideSwitch(slide, show, animation, visibleCssClass, timeBetweenSlides, timeToNextUpdate){
+    animate.animateInOut(slide, show, animation, visibleCssClass, timeBetweenSlides, () => nextSlideInterval = setTimeout(nextSlide(timeBetweenSlides, timeToNextUpdate), timeToNextUpdate));
   }
 
   namespace.callback = function(){}
