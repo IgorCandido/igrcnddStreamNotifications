@@ -72,7 +72,7 @@ slide = function(namespace){
   }
 
   function animateSlideSwitch(slide, show, animation, visibleCssClass, timeBetweenSlides, timeToNextUpdate){
-    animate.animateInOut(slide, show, animation, visibleCssClass, timeBetweenSlides, () => nextSlideInterval = setTimeout(nextSlide(timeBetweenSlides, timeToNextUpdate), timeToNextUpdate));
+    animate.animateInOut(slide, show, animation, visibleCssClass, timeBetweenSlides, () => nextSlideInterval = setTimeout( () => nextSlide(timeBetweenSlides, timeToNextUpdate), timeToNextUpdate));
   }
 
   namespace.callback = function(){}

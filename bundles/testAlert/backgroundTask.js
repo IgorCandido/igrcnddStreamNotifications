@@ -45,6 +45,7 @@ module.exports = function(nodecg, Twitch){
 		});
 	}
 
+	// Social links slides
 	function PushSocials(){
 			var socialImages = nodecg.Replicant('assets:socials').value;
 
