@@ -6,7 +6,7 @@
             "enabled": true,
             "clientID": "mmc7pl9j1dnwe1gj2biuvajzbulswm",
             "clientSecret": "a9q0orqjat0rkuelpwi41c42ebizzp",
-            "scope": "user_read",
+            "scope": "user_read channel_read channel_subscriptions",
             "allowedUsernames": [
                 "igrcndd"
             ]

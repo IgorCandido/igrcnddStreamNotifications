@@ -10,7 +10,11 @@ COPY . /usr/src/app/
 RUN npm install -g bower
 RUN npm install --production
 RUN bower install --allow-root
+RUN npm install -g nodecg-cli
+
+# RUN cd bundles && cd testAlert && nodecg install
+
 
 # The command to run
 EXPOSE 9090
-CMD ["node", "index.js"]
+CMD ["node", "--inspect", "index.js"]

@@ -1,69 +1,75 @@
 {
-    "name": "testAlert",
-    "version": "0.0.1",
-    "description": "Push alerts to stream",
-    "authors": [
-        "Igor Candido"
+  "name": "testAlert",
+  "version": "0.0.1",
+  "description": "Push alerts to stream",
+  "authors": [
+    "Igor Candido"
+  ],
+  "homepage": "",
+  "license": "",
+  "dependencies": {
+    "request-promise": "^3.0.0",
+    "ws": "^4.0.0"
+  },
+  "nodecg": {
+    "compatibleRange": "~0.9.9",
+    "dashboardPanels": [
+      {
+        "headerColor": "#564573",
+        "name": "testAlert",
+        "title": "Alert Dash",
+        "width": 2,
+        "file": "panel.html",
+        "faIcon": "fa-twitch"
+      }
     ],
-    "homepage": "",
-    "license": "",
-    "dependencies": {
-        "request": "^2.61.0"
-    },
-    "nodecg": {
-        "compatibleRange": "~0.9.9",
-        "dashboardPanels": [{
-            "headerColor": "#564573",
-            "name": "testAlert",
-            "title": "Alert Dash",
-            "width": 2,
-            "file": "panel.html",
-            "faIcon": "fa-twitch"
-        }],
-        "graphics": [{
-            "file": "index.html",
-            "width": 1280,
-            "height": 720,
-            "singleInstance": false
-        }, {
-            "file": "slidingbanner.html",
-            "width": 1280,
-            "height": 720,
-            "singleInstance": false
-          }],
-        "assetCategories": [
-          {
-            "name": "followerArt",
-            "title": "Follower Notification Background",
-            "allowedTypes": [
-              "jpg",
-              "jpeg",
-              "gif",
-              "png"
-            ]
-          },
-          {
-            "name": "socials",
-            "title": "Social images",
-            "allowedTypes": [
-              "jpg",
-              "jpeg",
-              "gif",
-              "png"
-            ]
-          }
-        ],
-        "soundCues": [
-          {
-            "name": "follower",
-            "defaultVolume": 100,
-            "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
-          },
-          {
-            "name": "subscriber",
-            "defaultVolume": 100,
-            "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
-          }
+    "graphics": [
+      {
+        "file": "index.html",
+        "width": 1280,
+        "height": 720,
+        "singleInstance": false
+      },
+      {
+        "file": "slidingbanner.html",
+        "width": 1280,
+        "height": 720,
+        "singleInstance": false
+      }
+    ],
+    "assetCategories": [
+      {
+        "name": "followerArt",
+        "title": "Follower Notification Background",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
         ]
-    }
+      },
+      {
+        "name": "socials",
+        "title": "Social images",
+        "allowedTypes": [
+          "jpg",
+          "jpeg",
+          "gif",
+          "png"
+        ]
+      }
+    ],
+    "soundCues": [
+      {
+        "name": "follower",
+        "defaultVolume": 100,
+        "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
+      },
+      {
+        "name": "subscriber",
+        "defaultVolume": 100,
+        "defaultFile": "sound/opm-guitar-bridge-no-3.mp3"
+      }
+    ]
+  }
 }

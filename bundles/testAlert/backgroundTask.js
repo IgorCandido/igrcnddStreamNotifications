@@ -1,3 +1,12 @@
+const request = require('request-promise');
+const app = require('express')();
+const ws = require('ws');
+let accessToken;
+let channelId;
+let _session;
+let websocket;
+
+
 module.exports = function(nodecg, Twitch){
 	var lastFollowRequest = nodecg.Replicant('lastFollowRequests', {defaultValue: "1970-01-01T00:00:00.000Z"});
 	var followOffset = nodecg.Replicant('followOffset', {defaultValue: 0});
@@ -7,6 +16,93 @@ module.exports = function(nodecg, Twitch){
 													lastObservedDate: function(){return new Date(this.lastObserved.value)},
 													eventText: function(event){ return event.user.display_name },
 													getElements: function(twitchResponse){ return twitchResponse.body.follows; }}]
+
+
+	const loginLib = require('../../lib/login');
+
+	// Non-confidential session details are made available to dashboard & view
+	const sessionReplicant = nodecg.Replicant('session', {defaultValue: null, persistent: false});
+
+	// Capture the relevant session data the moment our user logs in
+	loginLib.on('login', session => {
+		const user = session.passport.user;
+		_session = session;
+
+		nodecg.log.info("Received Login with access Token:" + user.accessToken)
+		if (user.provider === 'twitch' && user.username === nodecg.bundleConfig.username) {
+			// Update the 'session' syncedconst with only the non-confidential information
+			sessionReplicant.value = {
+				provider: user.provider, // should ALWAYS be 'twitch'
+				username: user.username,
+				displayName: user.displayName,
+				logo: user._json.logo,
+				url: user._json._links.self
+			};
+			accessToken = user.accessToken;
+		}
+	});
+
+	app.get('/testAlert/checkuser', (req, res) => {
+		nodecg.log.info("Updated Login with access Token: " + req.session.passport.user.accessToken)
+
+		nodecg.log.info("fetching channelId")
+		Twitch.get("/channel").then(response => {
+			if (response.statusCode !== 200) {
+		        return nodecg.log.error(response.body.error, response.body.message);
+		    }
+				// Got channel id
+				nodecg.log.info("Got Channel Id: " + response.body._id)
+		    channelId = response.body._id;
+
+		}).catch(err =>{
+			nodecg.log.error(err);
+		});
+
+		if (req.session.passport && req.session.passport.user) {
+			const user = req.session.passport.user;
+			if (user.username === nodecg.bundleConfig.username) {
+				// Update the 'session' Replicant with only the non-confidential information
+				sessionReplicant.value = {
+					provider: user.provider, // should ALWAYS be 'twitch'
+					username: user.username,
+					displayName: user.displayName,
+					logo: user._json.logo,
+					url: user._json._links.self
+				};
+				accessToken = user.accessToken;
+				_session = req.session;
+			}
+		}
+		websocket = new ws("wss://pubsub-edge.twitch.tv")
+
+		websocket.on('open' , function() {
+			nodecg.log.info("Connection established")
+
+			// Bits
+			nodecg.log.info("Subscribed bits")
+			websocket.send(JSON.stringify({"type":"LISTEN","nonce":"sad","data":{"topics":["channel-bits-events-v1."+channelId],"auth_token":accessToken}}), function(c){
+				nodecg.log.info("Received event: " + c)
+			})
+
+			// Subs
+			nodecg.log.info("Subscribed bits")
+			websocket.send(JSON.stringify({"type":"LISTEN","nonce":"sad","data":{"topics":["channel-subscribe-events-v1."+channelId],"auth_token":accessToken}}), function(c){
+				nodecg.log.info("Received event: " + c)
+			})
+		})
+
+		websocket.on("message", function(text){
+			nodecg.log.info("Received: " + text)
+		})
+
+		websocket.on("close", function(code, reason) {
+			nodecg.log.info("Connection closed by "+JSON.stringify(reason))
+		})
+
+		res.sendStatus(200);
+	});
+
+	nodecg.mount(app);
 
 	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
 

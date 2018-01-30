@@ -1,5 +1,7 @@
 var typeOfNotification = [{notificationText: " is now following", type: "Follower"}];
 
+fetch('/testAlert/checkuser', {method: 'GET', credentials: 'include'});
+
 $( document ).ready(function() {
 
 	$("#toggle").click(function(){
