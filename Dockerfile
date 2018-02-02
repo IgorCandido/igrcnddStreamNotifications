@@ -14,7 +14,4 @@ RUN npm install -g nodecg-cli
 
 # RUN cd bundles && cd testAlert && nodecg install
 
-
-# The command to run
-EXPOSE 9090
-CMD ["node", "--inspect", "index.js"]
+CMD ["node", "--inspect=0.0.0.0:9229", "index.js"]

@@ -1,11 +1,11 @@
 const request = require('request-promise');
 const app = require('express')();
-const ws = require('ws');
+const path = require('path');
+const pubsub = require( path.resolve( __dirname, "./twitchpubsub.js" ) );
 let accessToken;
 let channelId;
 let _session;
-let websocket;
-
+let socket;
 
 module.exports = function(nodecg, Twitch){
 	var lastFollowRequest = nodecg.Replicant('lastFollowRequests', {defaultValue: "1970-01-01T00:00:00.000Z"});
@@ -73,31 +73,27 @@ module.exports = function(nodecg, Twitch){
 				_session = req.session;
 			}
 		}
-		websocket = new ws("wss://pubsub-edge.twitch.tv")
+		socket = new pubsub("wss://pubsub-edge.twitch.tv", channelId, accessToken, nodecg)
 
-		websocket.on('open' , function() {
+		socket.onOpen = function() {
 			nodecg.log.info("Connection established")
 
 			// Bits
 			nodecg.log.info("Subscribed bits")
-			websocket.send(JSON.stringify({"type":"LISTEN","nonce":"sad","data":{"topics":["channel-bits-events-v1."+channelId],"auth_token":accessToken}}), function(c){
-				nodecg.log.info("Received event: " + c)
-			})
+			socket.subscribe("bits")
 
 			// Subs
-			nodecg.log.info("Subscribed bits")
-			websocket.send(JSON.stringify({"type":"LISTEN","nonce":"sad","data":{"topics":["channel-subscribe-events-v1."+channelId],"auth_token":accessToken}}), function(c){
-				nodecg.log.info("Received event: " + c)
-			})
-		})
+			nodecg.log.info("Subscribed subs")
+			socket.subscribe("subs")
+		}
 
-		websocket.on("message", function(text){
-			nodecg.log.info("Received: " + text)
-		})
+		socket.onReceive = function(topic, type, message){
+			nodecg.log.info("Received from topic " + text + " with of type " + type + " with content " + message)
+		}
 
-		websocket.on("close", function(code, reason) {
-			nodecg.log.info("Connection closed by "+JSON.stringify(reason))
-		})
+		socket.onClose = function(code, reason) {
+			nodecg.log.info("Connection closed by "+JSON.stringify(reason) + " with code " + code)
+		}
 
 		res.sendStatus(200);
 	});
