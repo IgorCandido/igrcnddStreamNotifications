@@ -9,6 +9,16 @@ pubsub = function(namespace){
       function handleReceive(message){
         var messageObject = JSON.parse(message);
 
+        nodecg.log.info("Received: " + JSON.stringify(messageObject))
+
+        if(messageObject.type == "PONG"){
+          nodecg.log.info("PONG")
+        }
+
+        if(messageObject.type == "RECONNECT"){
+          nodecg.log.info("RECONNECT")
+        }
+
         if(messageObject.type == "MESSAGE"){
           let type
           var messageContent = JSON.parse(messageObject.data.message);
@@ -38,7 +48,10 @@ pubsub = function(namespace){
       that = this;
 
       websocket.on("open", function(){
-        that.hearthbeatInterval = setInterval(() => websocket.ping("noop"), 5000)
+        that.hearthbeatInterval = setInterval(() => {
+                                                      nodecg.log.info("pinging");
+                                                      that.sendMessage({"type": "PING"})
+                                                    }, 10000)
 
         websocket.on("message", handleReceive)
         websocket.on("close", handleClose)
@@ -55,11 +68,12 @@ pubsub = function(namespace){
           topic = "channel-subscribe-events-v1."
         }
 
-        that.sendMessage({"type":"LISTEN","nonce": Math.random(),"data":{"topics":[topic+channelId],"auth_token":accessToken}})
+        that.sendMessage({"type":"LISTEN","nonce": ""+ Math.floor(Math.random() * (9000 - 0 + 1)) + 0,"data":{"topics":[topic+channelId],"auth_token":accessToken}})
       }
 
-      this.sendMessage = function(message){
-        websocket.send(JSON.stringify(message))
+      this.sendMessage = function(message, callback){
+        nodecg.log.info("Sending: " + JSON.stringify(message))
+        websocket.send(JSON.stringify(message), callback)
       }
 
       // Handle a message to a topic

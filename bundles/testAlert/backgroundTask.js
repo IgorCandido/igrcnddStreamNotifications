@@ -54,6 +54,10 @@ module.exports = function(nodecg, Twitch){
 				nodecg.log.info("Got Channel Id: " + response.body._id)
 		    channelId = response.body._id;
 
+				// Connect to pub sub
+
+				subscribeToPubSub();
+
 		}).catch(err =>{
 			nodecg.log.error(err);
 		});
@@ -73,6 +77,13 @@ module.exports = function(nodecg, Twitch){
 				_session = req.session;
 			}
 		}
+
+		res.sendStatus(200);
+	});
+
+	nodecg.mount(app);
+
+	function subscribeToPubSub(){
 		socket = new pubsub("wss://pubsub-edge.twitch.tv", channelId, accessToken, nodecg)
 
 		socket.onOpen = function() {
@@ -94,11 +105,8 @@ module.exports = function(nodecg, Twitch){
 		socket.onClose = function(code, reason) {
 			nodecg.log.info("Connection closed by "+JSON.stringify(reason) + " with code " + code)
 		}
+	}
 
-		res.sendStatus(200);
-	});
-
-	nodecg.mount(app);
 
 	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
 
