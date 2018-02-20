@@ -9,14 +9,9 @@ pubsub = function(namespace){
       function handleReceive(message){
         var messageObject = JSON.parse(message);
 
-        nodecg.log.info("Received: " + JSON.stringify(messageObject))
-
-        if(messageObject.type == "PONG"){
-          nodecg.log.info("PONG")
-        }
-
         if(messageObject.type == "RECONNECT"){
           nodecg.log.info("RECONNECT")
+
         }
 
         if(messageObject.type == "MESSAGE"){
@@ -43,20 +38,25 @@ pubsub = function(namespace){
         that.onClose(message);
       }
 
-      websocket = new ws(url)
+      function generateNonce(){
+        return ""+ Math.floor(Math.random() * (9000 - 0 + 1)) + 0
+      }
 
-      that = this;
+      this.connect = function() {
+        websocket = new ws(url)
 
-      websocket.on("open", function(){
-        that.hearthbeatInterval = setInterval(() => {
-                                                      nodecg.log.info("pinging");
-                                                      that.sendMessage({"type": "PING"})
-                                                    }, 10000)
+        that = this;
 
-        websocket.on("message", handleReceive)
-        websocket.on("close", handleClose)
-        that.onOpen();
-      })
+        websocket.on("open", function(){
+          that.hearthbeatInterval = setInterval(() => {
+                                                        that.sendMessage({"type": "PING"})
+                                                      }, 10000)
+
+          websocket.on("message", handleReceive)
+          websocket.on("close", handleClose)
+          that.onOpen();
+        })
+      }
 
       this.subscribe = function(type){
         let topic
@@ -68,11 +68,10 @@ pubsub = function(namespace){
           topic = "channel-subscribe-events-v1."
         }
 
-        that.sendMessage({"type":"LISTEN","nonce": ""+ Math.floor(Math.random() * (9000 - 0 + 1)) + 0,"data":{"topics":[topic+channelId],"auth_token":accessToken}})
+        that.sendMessage({"type":"LISTEN","nonce": generateNonce(),"data":{"topics":[topic+channelId],"auth_token":accessToken}})
       }
 
       this.sendMessage = function(message, callback){
-        nodecg.log.info("Sending: " + JSON.stringify(message))
         websocket.send(JSON.stringify(message), callback)
       }
 
@@ -84,6 +83,8 @@ pubsub = function(namespace){
 
       // Handle close of connection
       this.onClose = function(code, reason) {}
+
+      this.connect();
   }
 
   return namespace;

@@ -55,7 +55,6 @@ module.exports = function(nodecg, Twitch){
 		    channelId = response.body._id;
 
 				// Connect to pub sub
-
 				subscribeToPubSub();
 
 		}).catch(err =>{
