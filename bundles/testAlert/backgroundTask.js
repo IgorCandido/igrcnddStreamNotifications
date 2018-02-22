@@ -6,7 +6,17 @@ module.exports = function(nodecg, Twitch){
 	 												offset: nodecg.Replicant('followOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastFollowRequest', {defaultValue: "1970-01-01T00:00:00.000Z"}),
 													lastObservedDate: function(){return new Date(this.lastObserved.value)},
 													eventText: function(event){ return event.user.display_name },
-													getElements: function(twitchResponse){ return twitchResponse.body.follows; }}]
+													getElements: function(twitchResponse){ return twitchResponse.body.follows; },
+												  endCycle: function(response){
+																											 nodecg.log.info("Response total: " + response._total +" and offset is "+ this.offset.value)
+																											 // We lost followers :(
+														 													 if(response._total == 0){
+																												 // We didn't had any :(
+																												 if(this.offset.value == 0){
+																													 return;
+																												 }
+																												 --this.offset.value;
+																											 };}}]
 
 	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
 
@@ -24,9 +34,9 @@ module.exports = function(nodecg, Twitch){
 					trackingEvent.offset.value += 1;
 					trackingEvent.lastObserved.value = eventDate.toISOString();
 				}
-
-
 			})
+			nodecg.log.info(JSON.stringify(response))
+			trackingEvent.endCycle(response.body);
 		});
 	}
 
