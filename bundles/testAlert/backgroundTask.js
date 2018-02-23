@@ -1,12 +1,9 @@
 module.exports = function(nodecg, Twitch){
-	var lastFollowRequest = nodecg.Replicant('lastFollowRequests', {defaultValue: "1970-01-01T00:00:00.000Z"});
-	var followOffset = nodecg.Replicant('followOffset', {defaultValue: 0});
-	var lastFollowRequestDate = new Date(lastFollowRequest.value);
 	var trackingEvents = [{type: 0, display: "Followers", eventId: "channel-followed", resourceUrl: "/channels/{{username}}/follows",
-	 												offset: nodecg.Replicant('followOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastFollowRequest', {defaultValue: "1970-01-01T00:00:00.000Z"}),
 													lastObservedDate: function(){return new Date(this.lastObserved.value)},
 													eventText: function(event){ return event.user.display_name },
 													getElements: function(twitchResponse){ return twitchResponse.body.follows; },
+													elementsPerPage: 25,
 												  endCycle: function(response){
 																											 nodecg.log.info("Response total: " + response._total +" and offset is "+ this.offset.value)
 																											 // We lost followers :(
@@ -31,11 +28,15 @@ module.exports = function(nodecg, Twitch){
 					nodecg.log.info("New event observed")
 					nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
 
-					trackingEvent.offset.value += 1;
 					trackingEvent.lastObserved.value = eventDate.toISOString();
 				}
+
+				if(trackingEvent.lastObservedDate() != eventDate)
+				{
+						trackingEvent.offset.value += 1;
+				}
+
 			})
-			nodecg.log.info(JSON.stringify(response))
 			trackingEvent.endCycle(response.body);
 		});
 	}
@@ -46,7 +47,7 @@ module.exports = function(nodecg, Twitch){
 	function FetchEvents(nodecg, Twitch, trackingEvent, callback){
 		nodecg.log.info("Offset "+trackingEvent.offset.value)
 		Twitch.get(trackingEvent.resourceUrl, {
-				    limit: 25,
+				    limit: trackingEvent.elementsPerPage,
 				    direction: 'asc',
 				    offset: trackingEvent.offset.value
 		}).then(response =>{
