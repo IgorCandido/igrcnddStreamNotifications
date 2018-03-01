@@ -15,6 +15,15 @@ module.exports = function(nodecg, Twitch){
 	 												offset: nodecg.Replicant('followOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastFollowRequestx', {defaultValue: "1970-01-01T00:00:00.000Z"}),
 													lastObservedDate: function(){return new Date(this.lastObserved.value)},
 													eventText: function(event){ return event.user.display_name },
+													getElements: function(twitchResponse){ return twitchResponse.body.follows; }},
+												{type: 1, display: "Bits", eventId: "bits-cheered",
+	 												lastObserved: nodecg.Replicant('lastBitRequest', {defaultValue: "1970-01-01T00:00:00.000Z"}),
+													lastObservedDate: function(){return new Date(this.lastObserved.value)},
+													eventText: function(event){ return event.data.user_name }},
+												{type: 2, display: "Subscribed", eventId: "channel-followed", resourceUrl: "/channels/{{username}}/follows",
+	 												offset: nodecg.Replicant('followOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastFollowRequestx', {defaultValue: "1970-01-01T00:00:00.000Z"}),
+													lastObservedDate: function(){return new Date(this.lastObserved.value)},
+													eventText: function(event){ return event.user.display_name },
 													getElements: function(twitchResponse){ return twitchResponse.body.follows; }}]
 
 
@@ -41,6 +50,42 @@ module.exports = function(nodecg, Twitch){
 			accessToken = user.accessToken;
 		}
 	});
+
+	function subscribeToPubSub(){
+		socket = new pubsub("wss://pubsub-edge.twitch.tv", channelId, accessToken, nodecg)
+
+		socket.onOpen = function() {
+			nodecg.log.info("Connection established")
+
+			// Bits
+			nodecg.log.info("Subscribed bits")
+			socket.subscribe("bits")
+
+			// Subs
+			nodecg.log.info("Subscribed subs")
+			socket.subscribe("subs")
+		}
+
+		socket.onReceive = function(topic, type, message){
+			nodecg.log.info("Received from topic " + text + " with of type " + type + " with content " + message)
+
+			var trackEvent
+			if(type=="bits")
+			{
+				trackEvent = trackingEvents[1]
+			}
+			if(type="subs")
+			{
+				trackEvent = trackingEvents[2]
+			}
+
+			HandleEvent(message, nodecg, trackEvent)
+		}
+
+		socket.onClose = function(code, reason) {
+			nodecg.log.info("Connection closed by "+JSON.stringify(reason) + " with code " + code)
+		}
+	}
 
 	app.get('/testAlert/checkuser', (req, res) => {
 		nodecg.log.info("Updated Login with access Token: " + req.session.passport.user.accessToken)
@@ -82,47 +127,25 @@ module.exports = function(nodecg, Twitch){
 
 	nodecg.mount(app);
 
-	function subscribeToPubSub(){
-		socket = new pubsub("wss://pubsub-edge.twitch.tv", channelId, accessToken, nodecg)
+	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
+	function HandleEvent(event, nodecg, trackingEvent){
+		var eventDate = new Date(event.created_at);
 
-		socket.onOpen = function() {
-			nodecg.log.info("Connection established")
+		//New observed
+		if(trackingEvent.lastObservedDate() < eventDate){
+			nodecg.log.info("New event observed")
+			nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
 
-			// Bits
-			nodecg.log.info("Subscribed bits")
-			socket.subscribe("bits")
-
-			// Subs
-			nodecg.log.info("Subscribed subs")
-			socket.subscribe("subs")
-		}
-
-		socket.onReceive = function(topic, type, message){
-			nodecg.log.info("Received from topic " + text + " with of type " + type + " with content " + message)
-		}
-
-		socket.onClose = function(code, reason) {
-			nodecg.log.info("Connection closed by "+JSON.stringify(reason) + " with code " + code)
+			trackingEvent.offset.value += 1;
+			trackingEvent.lastObserved.value = eventDate.toISOString();
 		}
 	}
-
-
-	// Twitch API seems to only allow us to poll list of followers no ability to be notified of next new follower seems to be provided
 
   // Iterate over new events and push notification
 	function NewNotification(nodecg, Twitch, trackingEvent){
 		FetchEvents(nodecg, Twitch, trackingEvent, function(response){
 			trackingEvent.getElements(response).forEach(event => {
-				var eventDate = new Date(event.created_at);
-
-				//New observed
-				if(trackingEvent.lastObservedDate() < eventDate){
-					nodecg.log.info("New event observed")
-					nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
-
-					trackingEvent.offset.value += 1;
-					trackingEvent.lastObserved.value = eventDate.toISOString();
-				}
+				HandleEvent(event, nodecg, trackingEvent)
 			})
 		});
 	}

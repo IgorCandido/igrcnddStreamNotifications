@@ -2,7 +2,8 @@ var visible = false;
 
 var typeOfNotification = [
 	{notificationText: " is now following", type: "Follower", playAlert: function(){ nodecg.playSound("follower") }},
-	{notificationText: " just subscribed!", type: "Subscriber", playAlert: function(){ nodecg.playSound("subscriber")}}
+	{notificationText: " just cheered", type: "Bits", playAlert: function(){ nodecg.playSound("cheer")}},
+	{notificationText: " just subscribed!", type: "Subscriber", playAlert: function(){ nodecg.playSound("subscriber")}
 ];
 
 nodecg.listenFor('channel-followed', function(user){

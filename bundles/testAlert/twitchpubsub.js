@@ -11,7 +11,7 @@ pubsub = function(namespace){
 
         if(messageObject.type == "RECONNECT"){
           nodecg.log.info("RECONNECT")
-
+          this.connect();
         }
 
         if(messageObject.type == "MESSAGE"){
