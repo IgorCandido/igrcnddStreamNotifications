@@ -4,9 +4,12 @@ const oauth2 = require('simple-oauth2')
 
 const client = new Mixer.Client(new Mixer.DefaultRequestRunner());
 
+let nextFollow;
+
 module.exports = function(nodecg){
   let channelId;
-  var regexLinks = new RegExp('<(?<url>[a-zA-Z0-9/&=?]*)>.*rel=\\"(?<relation>[a-zA-Z]*)\\"');
+  nextFollow = nodecg.Replicant('mixerNextFollowrss');
+  var regexLinks = new RegExp('</api/v[0-9]+/([a-zA-Z0-9/&=?]*)>.*rel=\"([a-zA-Z]*)\"');
 
   var oauthClient = oauth2.create({
 		client : {
@@ -63,6 +66,9 @@ module.exports = function(nodecg){
 			}).then(response =>{
 				console.log(response.body);
         channelId = response.body.channel.id;
+        if(nextFollow.value == null){
+          nextFollow.value = `channels/${channelId}/follow?limit=10&page=0`;
+        }
 			})
 
 
@@ -76,26 +82,37 @@ module.exports = function(nodecg){
 
   parsePagination = function(linkInfo){
     var links = linkInfo.split(',');
+    var parseLinks = []
 
-    forearch(link : links){
-      var r = regexLinks.exec(link);
-      console.log("Link parsed " + JSON.stringify(r));
+    for(let i=0; i < links.length; ++i){
+      var r = regexLinks.exec(links[i]);
+      console.log("Link parsed " + JSON.stringify(r) + " match[0] " + r[0] + " match[1] " + r[1]+ " match[2] " + r[2]);
+      parseLinks[i] = {url: r[1], relation: r[2]}
     }
+
+    return parseLinks;
   }
 
   parseFollowers = function(response){
     var pagination = response.headers.link;
     var info = parsePagination(pagination);
+    return {followers: response.body, pagination: info}
   }
 
   this.followers = function(){
     if(channelId != null){
-      client.request('GET', `channels/${channelId}/follow?limit=10&page=0`)
+      url = nextFollow.value
+      console.log("next fetch url "+url)
+      client.request('GET', url)
       .then(res => {
           const body = JSON.stringify(res);
-          parseFollowers(res);
+          var followers = parseFollowers(res);
 
-          console.log(`You have ${body} total viewers...`);
+          console.log(`You have followers: ${JSON.stringify(followers.followers)} and pagination: ${JSON.stringify(followers.pagination)}`);
+          nextFollow.value = followers.pagination.find((element) =>{
+            return element.relation == "next";
+          }).url;
+          return followers;
       });
     }
   }

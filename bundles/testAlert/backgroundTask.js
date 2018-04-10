@@ -7,13 +7,13 @@ module.exports = function(nodecg, Twitch){
 													lastObservedDate: function(){return new Date(this.lastObserved.value)},
 													eventText: function(event){ return event.user.display_name },
 													getElements: function(twitchResponse){ return twitchResponse.body.follows; },
-												service="twitch"},
+												service:"twitch"},
 												{type: 1, display: "Followers", eventId: "channel-followed",
 												 												offset: nodecg.Replicant('followMixerOffset', {defaultValue: 0}), lastObserved: nodecg.Replicant('lastMixerFollowRequest', {defaultValue: "1970-01-01T00:00:00.000Z"}),
 																								lastObservedDate: function(){return new Date(this.lastObserved.value)},
 																								eventText: function(event){ return event.user.display_name },
 																								getElements: function(twitchResponse){ return twitchResponse.body.follows; },
-												service="mixer"}]
+												service:"mixer"}]
 
 	var mixerClient = require("./mixerIntegration.js")(nodecg);
 
@@ -41,7 +41,7 @@ module.exports = function(nodecg, Twitch){
 		}
 
 		if(trackingEvent.service=="mixer"){
-
+			mixerClient.followers();
 		}
 	}
 
@@ -100,8 +100,6 @@ module.exports = function(nodecg, Twitch){
 
 	// Show socials
 	setTimeout(PushSocials, periodforslides);
-
-	mixerClient.followers();
 }
 
 
