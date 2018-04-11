@@ -5,27 +5,30 @@ animate = function(namespace){
   // Ux manipulation to show alert
   // Receive callback to notify that the animation is finished
   namespace.animateInOut = function(element, show, animation, visibleCssClass, animationSpeed, callback){
-    animation =  animation || "bounceOutRight";
+    return new Promise( function(resolve, reject){
+      animation =  animation || "bounceOutRight";
 
-    if(animationSpeed != null){
-      $(element).css({'animationDuration' : animationSpeed+"ms"});
-    }
+      if(animationSpeed != null){
+        $(element).css({'animationDuration' : animationSpeed+"ms"});
+      }
 
-    animationString = animation + " animated"
-  	if(show){
-  	   $(element).addClass(visibleCssClass);
-    }
-    nodecg.log.info("startAnimation")
-    // Css magic to animate the alert in or out
-  	$(element).addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
-                                          () => {
-                                              endAnimation(element, show, animationString, visibleCssClass);
+      animationString = animation + " animated"
+      if(show){
+         $(element).addClass(visibleCssClass);
+      }
+      nodecg.log.info("startAnimation")
+      // Css magic to animate the alert in or out
+      $(element).addClass(animationString).one('webkitAnimationEnd mozAnimationEnd MSAnimationEnd oanimationend animationend',
+                                            () => {
+                                                endAnimation(element, show, animationString, visibleCssClass);
 
-                                              // Notify that animation has ended
-                                              if(callback != null){
-                                                  callback();
-                                              }
-                                          });
+                                                // Notify that animation has ended
+                                                if(callback != null){
+                                                    callback();
+                                                }
+                                                resolve();
+                                            });
+    })
   }
 
   namespace.show = function(element, visibleCssClass){

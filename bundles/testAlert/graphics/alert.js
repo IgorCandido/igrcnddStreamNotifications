@@ -16,7 +16,7 @@ nodecg.listenFor('changeVisibility', alert);
 function alert(d){
 	d = d || {};
 
-	queue.queue({show: () => showAlert(d), hide: () => hideAlert(d), showtime: d.showtime})
+	queue.queue({show: () => {return showAlert(d)}, hide: () => {return hideAlert(d)}, showtime: d.showtime})
 }
 
 // This function shows alerts and triggers queued alerts
@@ -38,11 +38,11 @@ function showAlert(d){
 
 	typeOfNotification[d.type].playAlert()
 
-	animate.animateInOut(banner, true, "bounceInRight", "bannerOn")
+	return animate.animateInOut(banner, true, "bounceInRight", "bannerOn")
 }
 
 function hideAlert(d){
 	console.log("hiding");
 	// Dispach queue when close animation is finished instead of based on hardcoded timeout
-	animate.animateInOut(banner, false, "bounceOutRight", "bannerOn")
+	return animate.animateInOut(banner, false, "bounceOutRight", "bannerOn")
 }

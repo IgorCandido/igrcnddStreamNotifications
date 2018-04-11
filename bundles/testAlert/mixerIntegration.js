@@ -100,21 +100,28 @@ module.exports = function(nodecg){
   }
 
   this.followers = function(){
-    if(channelId != null){
-      url = nextFollow.value
-      console.log("next fetch url "+url)
-      return client.request('GET', url)
-      .then(res => {
-          const body = JSON.stringify(res);
-          var followers = parseFollowers(res);
+    return new Promise(function(resolve,reject){
+      if(channelId != null){
+        url = nextFollow.value
+        console.log("next fetch url "+url)
+        return client.request('GET', url)
+        .then(res => {
+            const body = JSON.stringify(res);
+            var followers = parseFollowers(res);
 
-          console.log(`You have followers: ${JSON.stringify(followers.followers)} and pagination: ${JSON.stringify(followers.pagination)}`);
-          nextFollow.value = followers.pagination.find((element) =>{
-            return element.relation == "next";
-          }).url;
-          return followers;
-      });
-    }
+            console.log(`You have followers: ${JSON.stringify(followers.followers)} and pagination: ${JSON.stringify(followers.pagination)}`);
+            nextFollow.value = followers.pagination.find((element) =>{
+              return element.relation == "next";
+            }).url;
+            return resolve(followers);
+        });
+      }
+      else{
+        // NOOP no channel info loaded
+        nodecg.log.info("Mixer integration no channel Id loaded");
+        resolve({followers: [], pagination: []})
+      }
+    });
   }
 
 

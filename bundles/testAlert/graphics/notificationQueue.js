@@ -3,13 +3,18 @@ var queue = function Queue(namespace){
 	var innerQueue = [];
 
 	function execute(action) {
+		  if(namespace.showingAlert){
+				return;
+			}
+
 			namespace.showingAlert = true;
-			action.show();
-			setTimeout(() => {
-				 								action.hide()
-		 										namespace.showingAlert = false;
-												setTimeout(namespace.dispatch, 2000)
-											}, action.showtime)
+			action.show().then(
+													setTimeout(() => {
+														 								action.hide().then(function(done) {
+																							namespace.showingAlert = false;
+																							setTimeout(namespace.dispatch, 2000);
+																						})
+																					}, action.showtime));
 
 	}
 
