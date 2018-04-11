@@ -103,7 +103,7 @@ module.exports = function(nodecg){
     if(channelId != null){
       url = nextFollow.value
       console.log("next fetch url "+url)
-      client.request('GET', url)
+      return client.request('GET', url)
       .then(res => {
           const body = JSON.stringify(res);
           var followers = parseFollowers(res);

@@ -22,30 +22,28 @@ module.exports = function(nodecg, Twitch){
   // Iterate over new events and push notification
 	function NewNotification(nodecg, Twitch, trackingEvent){
 		if(trackingEvent.service=="twitch"){
-			FetchEvents(nodecg, Twitch, trackingEvent, function(response){
-				trackingEvent.getElements(response).forEach(event => {
-					var eventDate = new Date(event.created_at);
-
-					//New observed
-					if(trackingEvent.lastObservedDate() < eventDate){
-						nodecg.log.info("New event observed")
-						nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
-
-						trackingEvent.offset.value += 1;
-						trackingEvent.lastObserved.value = eventDate.toISOString();
-					}
-
-
-				})
-			});
+			FetchEvents(nodecg, Twitch, trackingEvent, handlerFollowersResponse);
 		}
 
 		if(trackingEvent.service=="mixer"){
-			mixerClient.followers();
+			trakingEvent = mixerClient.followers().then(handlerFollowersResponse);
 		}
 	}
 
+	function handlerFollowersResponse(trackingEvent){
+		trackingEvent.getElements(response).forEach(event => {
+			var eventDate = new Date(event.created_at);
 
+			//New observed
+			if(trackingEvent.lastObservedDate() < eventDate){
+				nodecg.log.info("New event observed")
+				nodecg.sendMessage(trackingEvent.eventId, {display_name : trackingEvent.eventText(event), type : trackingEvent.type, showtime: nodecg.Replicant('alertShowtime', {defaultValue: 2000}).value});
+
+				trackingEvent.offset.value += 1;
+				trackingEvent.lastObserved.value = eventDate.toISOString();
+			}
+		})
+	}
 
 	// Get the next 25 next followers
 	function FetchEvents(nodecg, Twitch, trackingEvent, callback){
